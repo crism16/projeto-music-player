@@ -5,6 +5,7 @@ const cover = document.getElementById('cover');
 const play = document.getElementById('play');
 const next = document.getElementById('next');
 const previus = document.getElementById('previus');
+const likeButton = document.getElementById('like');
 const currentProgress = document.getElementById('current-progress');
 const progressContainer = document.getElementById('progress-container');
 const shuffleButton = document.getElementById('shuffle');
@@ -16,24 +17,28 @@ const euSouAMareViva = {
     songName : 'Eu sou a maré viva',
     artist : 'Fresno',
     file : 'eu sou a maré viva',
-    music : 'Eu sou A Maré Viva'
+    music : 'Eu sou A Maré Viva',
+    liked: false,
 };
 const Manifesto = {
     songName : 'Manifesto feat Lenine e Emicida',
     artist : 'Fresno',
     file : 'capa manifesto',
-    music : 'Manifesto (feat. Lenine e Emicida)'
+    music : 'Manifesto (feat. Lenine e Emicida)',
+    liked: false,
 };
 const OUnicoAPerder = {
     songName : 'O Único a perder',
     artist : 'Fresno',
     file : 'o unico a perder',
-    music : 'O Único A Perder'
+    music : 'O Único A Perder',
+    liked: false,
+
 };
 let isPlaying = false;
 let isShuffled = false;
 let repeatOn = false;
-const originalPlaylist = [euSouAMareViva,Manifesto,OUnicoAPerder];
+const originalPlaylist = JSON.parse(localStorage.getItem('playlist')) ??[euSouAMareViva, Manifesto, OUnicoAPerder];
 let sortedPlaylist = [...originalPlaylist];
 let index = 0;
 
@@ -60,12 +65,25 @@ function playPauseDecider(){
     }
 }
 
+function likeButtonRender(){
+    if (sortedPlaylist [index].liked ===true){
+        likeButton.querySelector('.bi').classList.remove('bi-heart');
+        likeButton.querySelector('.bi').classList.add('bi-heart-fill');
+        likeButton.classList.add('button-active');
+    }
+    else {
+        likeButton.querySelector('.bi').classList.add('bi-heart');
+        likeButton.querySelector('.bi').classList.remove('bi-heart-fill');
+        likeButton.classList.remove('button-active');
+    }
+}
+
 function initializesong(){
     cover.src = `imagens/${sortedPlaylist[index].file}.jpg`;
     song.src = `songs/${sortedPlaylist[index].music}.mp3`;
     songName.innerText = sortedPlaylist [index].songName;
     bandName.innerText = sortedPlaylist [index].artist;
-    
+    likeButtonRender();
 }
 function previusSong(){
     if (index ===0){
@@ -163,6 +181,15 @@ function toHHMMSS (originalNumber){
 function updateTotalTime(){
     totalTime.innerText = toHHMMSS(song.duration);
 }
+function likeButtonClicked(){
+    if(sortedPlaylist[index].liked === false){
+        sortedPlaylist[index].liked = true;
+    }else{
+        sortedPlaylist[index].liked = false;
+    }
+    likeButtonRender();
+    localStorage.setItem('playlist',JSON.stringify(originalPlaylist));
+}
 initializesong();
 
 play.addEventListener('click', playPauseDecider);
@@ -174,4 +201,4 @@ song.addEventListener('loadedmetadata', updateTotalTime);
 progressContainer.addEventListener('click', jumpTo);
 shuffleButton.addEventListener('click', shuffleButtonClicked);
 repeatButton.addEventListener('click', repeatButtonClicked);
-
+likeButton.addEventListener('click', likeButtonClicked);
